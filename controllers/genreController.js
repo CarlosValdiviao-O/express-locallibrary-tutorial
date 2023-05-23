@@ -124,7 +124,7 @@ exports.genre_delete_post = asyncHandler(async (req, res, next) => {
 // Display genre update form on GET.
 exports.genre_update_get = asyncHandler(async (req, res, next) => {
   // Get genre for form
-  const genre = Genre.findById(req.params.id).exec();
+  const genre = await Genre.findById(req.params.id).exec();
     
   if (genre === null) {
     // No results.
@@ -153,7 +153,10 @@ exports.genre_update_post = [
     const errors = validationResult(req);
 
     // Create a genre object with escaped and trimmed data.
-    const genre = new Genre({ name: req.body.name });
+    const genre = new Genre({ 
+      name: req.body.name,
+      _id: req.params.id, // This is required, or a new ID will be assigned!
+     });
 
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/errors messages.

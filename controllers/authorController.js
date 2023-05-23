@@ -143,7 +143,7 @@ exports.author_delete_post = asyncHandler(async (req, res, next) => {
 // Display author update form on GET.
 exports.author_update_get = asyncHandler(async (req, res, next) => {
   // Get author for form
-  const author = Author.findById(req.params.id).exec();
+  const author = await Author.findById(req.params.id).exec();
     
   if (author === null) {
     // No results.
@@ -195,6 +195,7 @@ exports.author_update_post = [
       family_name: req.body.family_name,
       date_of_birth: req.body.date_of_birth,
       date_of_death: req.body.date_of_death,
+      _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
     if (!errors.isEmpty()) {

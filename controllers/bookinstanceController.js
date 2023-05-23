@@ -132,6 +132,8 @@ exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
   res.render("bookinstance_form", {
     title: "Update Book Instance",
     book_list: allBooks,
+    selected_book: bookInstance.book._id,
+    bookinstance: bookInstance,
   });
 });
 
@@ -160,6 +162,7 @@ exports.bookinstance_update_post = [
       imprint: req.body.imprint,
       status: req.body.status,
       due_back: req.body.due_back,
+      _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
     if (!errors.isEmpty()) {
@@ -171,6 +174,8 @@ exports.bookinstance_update_post = [
       res.render("bookinstance_form", {
         title: "Update Book Copy",
         book_list: allBooks,
+        selected_book: bookInstance.book._id,
+        bookinstance: bookInstance,
         errors: errors.array(),
       });
       return;
@@ -178,7 +183,7 @@ exports.bookinstance_update_post = [
       // Data from form is valid. Update the record.
       const thebookinstance = await BookInstance.findByIdAndUpdate(req.params.id, bookInstance, {});
       // Redirect to book instance detail page.
-      res.redirect(thebookintance.url);
+      res.redirect(thebookinstance.url);
     }
   }),
 ];

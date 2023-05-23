@@ -13,7 +13,7 @@ const BookInstanceSchema = new Schema({
     enum: ["Available", "Maintenance", "Loaned", "Reserved"],
     default: "Maintenance",
   },
-  due_back: { type: Date, default: Date.now },
+  due_back: { type: Date },
 });
 
 // Virtual for bookinstance's URL
@@ -23,7 +23,13 @@ BookInstanceSchema.virtual("url").get(function () {
 });
 
 BookInstanceSchema.virtual("due_back_formatted").get(function () {
-  return DateTime.fromJSDate(this.due_back).toLocaleString(DateTime.DATE_MED);
+  return this.due_back ? 
+    DateTime.fromJSDate(this.due_back).toLocaleString(DateTime.DATE_MED) :
+    'Not specified';
+});
+
+BookInstanceSchema.virtual("due_back_yyyy_mm_dd").get(function () {
+  return DateTime.fromJSDate(this.due_back).toISODate(); //format 'YYYY-MM-DD'
 });
 
 // Export model
