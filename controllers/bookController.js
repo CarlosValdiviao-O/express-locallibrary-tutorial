@@ -4,6 +4,7 @@ const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
 
 const { body, validationResult } = require("express-validator");
+const validator = require('validator');
 const asyncHandler = require("express-async-handler");
 
 exports.index = asyncHandler(async (req, res, next) => {
@@ -38,7 +39,9 @@ exports.book_list = asyncHandler(async (req, res, next) => {
     .sort({ title: 1 })
     .populate("author")
     .exec();
-
+  for (let i = 0; i < allBooks.length; i ++) {
+    allBooks[i].title = validator.unescape(allBooks[i].title);
+  }
   res.render("book_list", { title: "Book List", book_list: allBooks });
 });
 
@@ -56,6 +59,11 @@ exports.book_detail = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
+  for (let i = 0; i < bookInstances.length; i ++) {
+    bookInstances[i].imprint = validator.unescape(bookInstances[i].imprint);
+  }
+  book.title = validator.unescape(book.title);
+  book.summary = validator.unescape(book.summary);
 
   res.render("book_detail", {
     title: book.title,
@@ -135,6 +143,10 @@ exports.book_create_post = [
           genre.checked = "true";
         }
       }
+      
+      book.title = validator.unescape(book.title);
+      book.summary = validator.unescape(book.summary);
+
       res.render("book_form", {
         title: "Create Book",
         authors: allAuthors,
@@ -163,6 +175,10 @@ exports.book_delete_get = asyncHandler(async (req, res, next) => {
     res.redirect("/catalog/books");
   }
 
+  book.title = validator.unescape(book.title);
+  for (let i = 0; i < allInstancesOfBook.length; i ++) {
+    allInstancesOfBook[i].imprint = validator.unescape(allInstancesOfBook[i].imprint);
+  }
   res.render("book_delete", {
     title: "Delete Book",
     book: book,
@@ -180,6 +196,10 @@ exports.book_delete_post = asyncHandler(async (req, res, next) => {
 
   if (allInstancesOfBook.length > 0) {
     // Book has instances. Render in same way as for GET route.
+    for (let i = 0; i < allInstancesOfBook.length; i ++) {
+      allInstancesOfBook[i].imprint = validator.unescape(allInstancesOfBook[i].imprint);
+    }
+    book.title = validator.unescape(book.title);
     res.render("book_delete", {
       title: "Delete Book",
       book: book,
@@ -217,6 +237,9 @@ exports.book_update_get = asyncHandler(async (req, res, next) => {
       }
     }
   }
+
+  book.title = validator.unescape(book.title);
+  book.summary = validator.unescape(book.summary);
 
   res.render("book_form", {
     title: "Update Book",
@@ -286,6 +309,9 @@ exports.book_update_post = [
           genre.checked = "true";
         }
       }
+
+      book.title = validator.unescape(book.title);
+      book.summary = validator.unescape(book.summary);
       res.render("book_form", {
         title: "Update Book",
         authors: allAuthors,

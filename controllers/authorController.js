@@ -2,6 +2,7 @@ const Author = require("../models/author");
 const asyncHandler = require("express-async-handler");
 const Book = require("../models/book");
 const { body, validationResult } = require("express-validator");
+const validator = require('validator');
 
 // Display list of all Authors.
 exports.author_list = asyncHandler(async (req, res, next) => {
@@ -26,7 +27,10 @@ exports.author_detail = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
-
+  for (let i = 0; i < allBooksByAuthor.length; i ++) {
+    allBooksByAuthor[i].title = validator.unescape(allBooksByAuthor[i].title);
+    allBooksByAuthor[i].summary = validator.unescape(allBooksByAuthor[i].summary);
+  }
   res.render("author_detail", {
     title: "Author Detail",
     author: author,
@@ -109,7 +113,10 @@ exports.author_delete_get = asyncHandler(async (req, res, next) => {
     // No results.
     res.redirect("/catalog/authors");
   }
-
+  for (let i = 0; i < allBooksByAuthor.length; i ++) {
+    allBooksByAuthor[i].title = validator.unescape(allBooksByAuthor[i].title);
+    allBooksByAuthor[i].summary = validator.unescape(allBooksByAuthor[i].summary);
+  }
   res.render("author_delete", {
     title: "Delete Author",
     author: author,
@@ -127,6 +134,10 @@ exports.author_delete_post = asyncHandler(async (req, res, next) => {
 
   if (allBooksByAuthor.length > 0) {
     // Author has books. Render in same way as for GET route.
+    for (let i = 0; i < allBooksByAuthor.length; i ++) {
+      allBooksByAuthor[i].title = validator.unescape(allBooksByAuthor[i].title);
+      allBooksByAuthor[i].summary = validator.unescape(allBooksByAuthor[i].summary);
+    }
     res.render("author_delete", {
       title: "Delete Author",
       author: author,

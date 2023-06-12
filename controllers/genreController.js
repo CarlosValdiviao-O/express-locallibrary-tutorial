@@ -2,6 +2,7 @@ const Genre = require("../models/genre");
 const asyncHandler = require("express-async-handler");
 const Book = require("../models/book");
 const { body, validationResult } = require("express-validator");
+const validator = require('validator');
 
 // Display list of all Genre.
 exports.genre_list = asyncHandler(async (req, res, next) => {
@@ -25,7 +26,10 @@ exports.genre_detail = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
-
+  for (let i = 0; i < booksInGenre.length; i ++) {
+    booksInGenre[i].title = validator.unescape(booksInGenre[i].title);
+    booksInGenre[i].summary = validator.unescape(booksInGenre[i].summary);
+  }
   res.render("genre_detail", {
     title: "Genre Detail",
     genre: genre,
@@ -90,7 +94,10 @@ exports.genre_delete_get = asyncHandler(async (req, res, next) => {
     // No results.
     res.redirect("/catalog/genres");
   }
-
+  for (let i = 0; i < allBooksByGenre.length; i ++) {
+    allBooksByGenre[i].title = validator.unescape(allBooksByGenre[i].title);
+    allBooksByGenre[i].summary = validator.unescape(allBooksByGenre[i].summary);
+  }
   res.render("genre_delete", {
     title: "Delete Genre",
     genre: genre,
@@ -108,6 +115,10 @@ exports.genre_delete_post = asyncHandler(async (req, res, next) => {
 
   if (allBooksByGenre.length > 0) {
     // Genre has books. Render in same way as for GET route.
+    for (let i = 0; i < allBooksByGenre.length; i ++) {
+      allBooksByGenre[i].title = validator.unescape(allBooksByGenre[i].title);
+      allBooksByGenre[i].summary = validator.unescape(allBooksByGenre[i].summary);
+    }
     res.render("genre_delete", {
       title: "Delete Genre",
       genre: genre,

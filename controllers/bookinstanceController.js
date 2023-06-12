@@ -1,12 +1,16 @@
 const BookInstance = require("../models/bookinstance");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const validator = require('validator');
 const Book = require("../models/book");
 
 // Display list of all BookInstances.
 exports.bookinstance_list = asyncHandler(async (req, res, next) => {
   const allBookInstances = await BookInstance.find().populate("book").exec();
 
+  for (let i = 0; i < allBookInstances.length; i ++) {
+    allBookInstances[i].imprint = validator.unescape(allBookInstances[i].imprint);
+  }
   res.render("bookinstance_list", {
     title: "Book Instance List",
     bookinstance_list: allBookInstances,
@@ -25,6 +29,7 @@ exports.bookinstance_detail = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
+  bookInstance.imprint = validator.unescape(bookInstance.imprint);
 
   res.render("bookinstance_detail", {
     title: "Book:",
@@ -73,7 +78,10 @@ exports.bookinstance_create_post = [
       // There are errors.
       // Render form again with sanitized values and error messages.
       const allBooks = await Book.find({}, "title").exec();
-
+      bookInstance.imprint = validator.unescape(bookInstance.imprint);
+      for (let i = 0; i < allBooks.length; i ++) {
+        allBooks[i].title = validator.unescape(allBooks[i].title);
+      }
       res.render("bookinstance_form", {
         title: "Create BookInstance",
         book_list: allBooks,
@@ -99,7 +107,7 @@ exports.bookinstance_delete_get = asyncHandler(async (req, res, next) => {
     // No results.
     res.redirect("/catalog/bookinstances");
   }
-
+  bookInstance.imprint = validator.unescape(bookInstance.imprint);
   res.render("bookinstance_delete", {
     title: "Delete Book Instance",
     bookInstance: bookInstance,
@@ -128,7 +136,10 @@ exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   }
-
+  bookInstance.imprint = validator.unescape(bookInstance.imprint);
+  for (let i = 0; i < allBooks.length; i ++) {
+    allBooks[i].title = validator.unescape(allBooks[i].title);
+  }
   res.render("bookinstance_form", {
     title: "Update Book Instance",
     book_list: allBooks,
@@ -171,6 +182,10 @@ exports.bookinstance_update_post = [
       // Get all books for form
       const allBooks = await Book.find().exec();
 
+      bookInstance.imprint = validator.unescape(bookInstance.imprint);
+      for (let i = 0; i < allBooks.length; i ++) {
+        allBooks[i].title = validator.unescape(allBooks[i].title);
+      }
       res.render("bookinstance_form", {
         title: "Update Book Copy",
         book_list: allBooks,
